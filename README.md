@@ -18,4 +18,4 @@ i've taken a bootloader from my old OS and modified it!
 
 stage 1 is working!  
 
-time to start working on stage 2!
+stage 2 is... working? it's abit wonky and doesn't really properly fit the screen, but yeah

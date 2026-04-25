@@ -3,7 +3,7 @@ ORG 0x7C00
 
 %define STAGE2_LOAD_SEG 0x0000
 %define STAGE2_LOAD_OFF 0x8000
-%define STAGE2_SECTORS  4
+%define STAGE2_SECTORS  8
 
 start:
     cli
