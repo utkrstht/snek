@@ -10,7 +10,7 @@ elif command -v qemu-system-x86_64 >/dev/null 2>&1; then
   QEMU_BIN="qemu-system-x86_64"
 else
   echo "Error: QEMU not found in PATH." >&2
-  echo "Install with: sudo apt update && sudo apt install -y qemu-system-x86" >&2
+  echo "Run ./setup.sh to install dependencies." >&2
   exit 1
 fi
 

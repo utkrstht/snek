@@ -3,7 +3,7 @@ set -euo pipefail
 
 if ! command -v nasm >/dev/null 2>&1; then
   echo "Error: nasm not found in PATH." >&2
-  echo "Install with: sudo apt update && sudo apt install -y nasm" >&2
+  echo "Run ./setup.sh to install dependencies." >&2
   exit 1
 fi
 

@@ -22,3 +22,8 @@ then run `./main.sh` and it'll automatically build it and run qemu!
 - score, best, length bar!
 - moar colors
 - difficulty levels
+- rainbow hint
+
+#### latest commit name
+ignore this
+- feat/fix: add rainbow hint, fix food spawning on snek, more food, better rng
