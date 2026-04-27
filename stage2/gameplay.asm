@@ -4,6 +4,7 @@ init_game:
 
     mov byte [game_over], 0
     mov byte [paused], 0
+    mov byte [return_to_menu], 0
     mov byte [snake_len], 3
     mov byte [dir], 1
 
@@ -49,6 +50,11 @@ handle_input:
     je .toggle_pause
     cmp al, 'P'
     je .toggle_pause
+
+    cmp al, 'm'
+    je .to_menu
+    cmp al, 'M'
+    je .to_menu
 
     cmp byte [paused], 0
     jne .done
@@ -108,6 +114,21 @@ handle_input:
 
 .toggle_pause:
     xor byte [paused], 1
+    cmp byte [paused], 0
+    je .pause_off
+    call sound_pause_on
+    jmp .done
+
+.pause_off:
+    call sound_pause_off
+    jmp .done
+
+.to_menu:
+    call confirm_menu_popup
+    cmp al, 1
+    jne .done
+    mov byte [return_to_menu], 1
+    mov byte [paused], 0
 
 .done:
     ret
@@ -219,12 +240,14 @@ step_snake:
 
 .respawn:
     call update_best_score
+    call sound_food_eat
     mov al, [eaten_food_idx]
     call spawn_food_at_idx
     jmp .done
 
 .dead:
     mov byte [game_over], 1
+    call sound_game_over
 
 .done:
     ret

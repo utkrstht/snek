@@ -10,6 +10,12 @@ title_screen:
     mov [title_anim_tick], dx
     mov byte [title_rainbow_phase], 0
 
+    mov ax, dx
+    xor dx, dx
+    mov bx, 3
+    div bx
+    mov [title_hint_idx], dl
+
 .wait_key:
     call maybe_animate_title_hint
 
@@ -241,8 +247,28 @@ draw_rainbow_hint:
 
     mov dh, 15
     mov dl, 21
-    mov si, title_hint_msg
 
+    mov al, [title_hint_idx]
+    cmp al, 1
+    je .hint2
+    cmp al, 2
+    je .hint3
+    cmp al, 3
+    je .hint4
+    mov si, title_hint_msg
+    jmp .hint_chosen
+
+.hint2:
+    mov si, title_hint_msg2
+    jmp .hint_chosen
+
+.hint3:
+    mov si, title_hint_msg3
+
+.hint4:
+    mov si, title_hint_msg4
+
+.hint_chosen:
     mov al, [title_rainbow_phase]
     and al, 7
     xor bx, bx

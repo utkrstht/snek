@@ -22,6 +22,8 @@ main_loop:
 
     call wait_tick
     call handle_input
+    cmp byte [return_to_menu], 0
+    jne .menu
     cmp byte [paused], 0
     jne .draw_only
     call step_snake
@@ -41,13 +43,23 @@ main_loop:
     je game_restart
     cmp al, 'R'
     je game_restart
+    cmp al, 'm'
+    je .menu
+    cmp al, 'M'
+    je .menu
     jmp .wait_key
 
 .paused:
     call handle_input
+    cmp byte [return_to_menu], 0
+    jne .menu
     call wait_tick
     call draw_frame
 
     cmp byte [game_over], 0
     je main_loop
     jmp .wait_key
+
+.menu:
+    call title_screen
+    jmp game_restart

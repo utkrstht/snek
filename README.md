@@ -23,7 +23,21 @@ then run `./main.sh` and it'll automatically build it and run qemu!
 - moar colors
 - difficulty levels
 - rainbow hint
+- returning to menu 
+- popups
+- random hints :p
+
+## future features
+note: everything on this list is subject to change
+- store which has skins (red skin, blue skin, rainbow skin)
+- sounds (if i can convince qemu to relay sound to my pc)
+- ~~returning to menu~~
+- better looking food
+- better looking snek
+- better looking menu
+- ~~random hints~~
+- 
 
 #### latest commit name
 ignore this
-- feat/fix: add rainbow hint, fix food spawning on snek, more food, better rng
+- feat/fix: add rainbow hint, fix food spawning on snek, more food, better food rng
