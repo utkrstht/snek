@@ -2,7 +2,8 @@ title_screen:
     mov ax, 0x0003
     int 0x10
 
-    call clear_screen
+    mov byte [menu_state], 0
+    mov byte [menu_idx], 0
     call draw_title_screen
 
     mov ah, 0x00
@@ -25,71 +26,99 @@ title_screen:
 
     mov ah, 0x00
     int 0x16
+    
+    mov bl, [menu_state]
+    cmp bl, 0
+    je .main_menu_input
+    cmp bl, 1
+    je .handle_settings
+    cmp bl, 2
+    je .handle_credits
+    jmp .wait_key
 
+.handle_settings:
+    call settings_input_handler
+    jmp .wait_key
+
+.handle_credits:
+    call credits_input_handler
+    jmp .wait_key
+
+.main_menu_input:
     cmp al, 'w'
-    je .up
+    je .menu_up
     cmp al, 'W'
-    je .up
+    je .menu_up
     cmp ah, 0x48
-    je .up
+    je .menu_up
 
     cmp al, 's'
-    je .down
+    je .menu_down
     cmp al, 'S'
-    je .down
+    je .menu_down
     cmp ah, 0x50
-    je .down
-
-    cmp al, '1'
-    je .set_slow
-    cmp al, '2'
-    je .set_normal
-    cmp al, '3'
-    je .set_fast
+    je .menu_down
 
     cmp al, 0x0D
-    je .start
+    je .menu_select
     cmp al, ' '
-    je .start
+    je .menu_select
     jmp .wait_key
 
-.up:
-    cmp byte [difficulty_idx], 0
+.menu_up:
+    cmp byte [menu_idx], 0
     je .wait_key
-    dec byte [difficulty_idx]
+    dec byte [menu_idx]
     call draw_title_screen
     jmp .wait_key
 
-.down:
-    cmp byte [difficulty_idx], 2
-    je .wait_key
-    inc byte [difficulty_idx]
+.menu_down:
+    cmp byte [menu_idx], 2
+    jge .wait_key
+    inc byte [menu_idx]
     call draw_title_screen
     jmp .wait_key
 
-.set_slow:
-    mov byte [difficulty_idx], 0
-    call draw_title_screen
+.menu_select:
+    mov al, [menu_idx]
+    cmp al, 0
+    je .start_game
+    cmp al, 1
+    je .enter_settings
+    cmp al, 2
+    je .enter_credits
     jmp .wait_key
 
-.set_normal:
-    mov byte [difficulty_idx], 1
-    call draw_title_screen
-    jmp .wait_key
-
-.set_fast:
-    mov byte [difficulty_idx], 2
-    call draw_title_screen
-    jmp .wait_key
-
-.start:
+.start_game:
     call apply_difficulty
     ret
 
+.enter_settings:
+    mov byte [menu_state], 1
+    mov byte [menu_idx], 0
+    call draw_title_screen
+    jmp .wait_key
+
+.enter_credits:
+    mov byte [menu_state], 2
+    mov byte [menu_idx], 0
+    call draw_title_screen
+    jmp .wait_key
+
+.back_to_main:
+    mov byte [menu_state], 0
+    mov byte [menu_idx], 0
+    call draw_title_screen
+    jmp .wait_key
+
 draw_title_screen:
     call clear_screen
-    call draw_menu_box
 
+    mov bl, [menu_state]
+    cmp bl, 2
+    je .draw_credits_only
+
+    call draw_menu_box
     call draw_big_title
 
     mov dh, 14
@@ -100,31 +129,72 @@ draw_title_screen:
 
     call draw_rainbow_hint
 
+    mov bl, [menu_state]
+    cmp bl, 0
+    je .draw_main_menu
+    cmp bl, 1
+    je .draw_settings_menu
+    ret
+    
+.draw_credits_only:
+    call .draw_credits_menu
+    ret
+
+.draw_main_menu:
+    mov al, [menu_idx]
+    
     mov dh, 18
-    mov dl, 23
-    mov bl, 0x0F
-    mov si, diff_label_msg
+    mov dl, 20
+    cmp al, 0
+    jne .play_not_selected
+    mov bl, 0x70
+    jmp .play_print
+
+.play_not_selected:
+    mov bl, 0x07
+
+.play_print:
+    mov si, main_menu_play_msg
     call print_at
 
+    mov al, [menu_idx]
     mov dh, 19
-    mov dl, 24
+    mov dl, 20
+    cmp al, 1
+    jne .settings_not_selected
+    mov bl, 0x70
+
+    jmp .settings_print
+
+.settings_not_selected:
     mov bl, 0x07
-    mov si, diff_slow_msg
+
+.settings_print:
+    mov si, main_menu_settings_msg
     call print_at
 
+    mov al, [menu_idx]
     mov dh, 20
-    mov dl, 24
-    mov bl, 0x07
-    mov si, diff_normal_msg
-    call print_at
+    mov dl, 20
+    cmp al, 2
+    jne .credits_not_selected
+    mov bl, 0x70
+    jmp .credits_print
 
-    mov dh, 21
-    mov dl, 24
+.credits_not_selected:
     mov bl, 0x07
-    mov si, diff_fast_msg
+    
+.credits_print:
+    mov si, main_menu_credits_msg
     call print_at
+    ret
 
-    call draw_difficulty_cursor
+.draw_settings_menu:
+    call draw_settings_menu
+    ret
+
+.draw_credits_menu:
+    call draw_credits_menu
     ret
 
 draw_big_title:
@@ -159,62 +229,39 @@ draw_big_title:
     call print_at
     ret
 
-draw_difficulty_cursor:
-    mov dh, 19
-    mov dl, 22
-    mov bl, 0x08
-    mov al, ' '
-    call putc_at
 
-    mov dh, 20
-    mov dl, 22
-    mov bl, 0x08
-    mov al, ' '
-    call putc_at
-
-    mov dh, 21
-    mov dl, 22
-    mov bl, 0x08
-    mov al, ' '
-    call putc_at
-
-    mov al, [difficulty_idx]
-    cmp al, 0
-    jne .check_normal
-    mov dh, 19
-    jmp .mark
-
-.check_normal:
-    cmp al, 1
-    jne .mark_fast
-    mov dh, 20
-    jmp .mark
-
-.mark_fast:
-    mov dh, 21
-
-.mark:
-    mov dl, 22
-    mov bl, 0x0E
-    mov al, '>'
-    call putc_at
-    ret
 
 apply_difficulty:
     mov al, [difficulty_idx]
     cmp al, 0
     jne .normal
     mov byte [tick_delay], 6
-    ret
+    jmp .apply_food
 
 .normal:
     cmp al, 1
     jne .fast
     mov byte [tick_delay], 4
-    ret
+    jmp .apply_food
 
 .fast:
     mov byte [tick_delay], 2
+    
+.apply_food:
+    mov al, [food_spawn_idx]
+    cmp al, 0
+    jne .food_normal
+    mov byte [food_count], 1
+    ret
+
+.food_normal:
+    cmp al, 1
+    jne .food_high
+    mov byte [food_count], 3
+    ret
+
+.food_high:
+    mov byte [food_count], 5
     ret
 
 maybe_animate_title_hint:

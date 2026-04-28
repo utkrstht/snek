@@ -51,7 +51,8 @@ draw_border:
 
 draw_food:
     xor si, si
-    mov cx, FOOD_COUNT
+    xor cx, cx
+    mov cl, [food_count]
 
 .loop:
     cmp cx, 0
@@ -89,22 +90,89 @@ draw_snake:
     add al, BOARD_Y + 1
     mov dh, al
 
+    mov al, [snek_style_idx]
+    cmp al, 0
+    je .draw_style_classic
+
     cmp si, 0
-    jne .body
-    mov al, '@'
+    jne .not_head
+
+    mov al, [dir]
+    cmp al, 0
+    jne .head_right
+    mov al, '^'
+    jmp .draw_head
+
+.head_right:
+    cmp al, 1
+    jne .head_down
+    mov al, '>'
+    jmp .draw_head
+
+.head_down:
+    cmp al, 2
+    jne .head_left
+    mov al, 'v'
+    jmp .draw_head
+
+.head_left:
+    mov al, '<'
+
+.draw_head:
     mov bl, 0x0E
     call putc_at
     jmp .next
 
-.body:
+.not_head:
+    cmp cx, 1
+    je .tail
+
+    test si, 1
+    jz .body_even
     mov al, 'o'
     mov bl, 0x02
+    call putc_at
+    jmp .next
+
+.body_even:
+    mov al, 'O'
+    mov bl, 0x0A
+    call putc_at
+    jmp .next
+
+.tail:
+    mov al, '.'
+    mov bl, 0x03
     call putc_at
 
 .next:
     inc si
     dec cx
     jmp .loop
+
+.draw_style_classic:
+    cmp si, 0
+    jne .classic_not_head
+
+    mov al, '@'
+    mov bl, 0x0E
+    call putc_at
+    jmp .next
+
+.classic_not_head:
+    cmp cx, 1
+    je .classic_tail
+
+    mov al, 'o'
+    mov bl, 0x0A
+    call putc_at
+    jmp .next
+
+.classic_tail:
+    mov al, 'o'
+    mov bl, 0x02
+    call putc_at
+    jmp .next
 
 .done:
     ret

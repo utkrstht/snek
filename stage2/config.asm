@@ -3,4 +3,4 @@
 %define BOARD_W      40
 %define BOARD_H      18
 %define MAX_LEN      64
-%define FOOD_COUNT   3
+%define FOOD_COUNT   5

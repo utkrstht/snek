@@ -33,11 +33,11 @@ note: everything on this list is subject to change
 - sounds (if i can convince qemu to relay sound to my pc)
 - ~~returning to menu~~
 - better looking food
-- better looking snek
-- better looking menu
+- ~~better looking snek~~
+- ~~better looking menu~~
 - ~~random hints~~
-- 
+- GUI snek
 
 #### latest commit name
 ignore this
-- feat/fix: add rainbow hint, fix food spawning on snek, more food, better food rng
+- feat: add proper menu/settings/credits, new snek design!

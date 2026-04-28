@@ -187,7 +187,8 @@ step_snake:
     mov byte [ate_food], 0
     mov byte [eaten_food_idx], 0xFF
     xor si, si
-    mov cx, FOOD_COUNT
+    xor cx, cx
+    mov cl, [food_count]
 .food_check:
     cmp cx, 0
     je .shift
@@ -254,7 +255,8 @@ step_snake:
 
 spawn_all_food:
     xor si, si
-    mov cx, FOOD_COUNT
+    xor cx, cx
+    mov cl, [food_count]
 
 .loop:
     cmp cx, 0
@@ -316,7 +318,8 @@ spawn_food_at_idx:
 
 .check_food:
     xor bx, bx
-    mov cx, FOOD_COUNT
+    xor cx, cx
+    mov cl, [food_count]
 
 .check_food_loop:
     cmp cx, 0
