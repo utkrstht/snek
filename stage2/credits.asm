@@ -37,6 +37,12 @@ draw_credits_menu:
 
     mov dh, 15
     mov dl, 12
+    mov cx, 68
+    mov bl, 0x08
+    call clear_text_region
+
+    mov dh, 15
+    mov dl, 12
     mov bl, 0x0D
     mov si, credits_cats_1
     call print_at

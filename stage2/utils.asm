@@ -18,6 +18,24 @@ print_at:
 .done:
     ret
 
+clear_text_region:
+    push ax
+    push cx
+
+    mov al, ' '
+.loop:
+    test cx, cx
+    jz .done
+    call putc_at
+    inc dl
+    dec cx
+    jmp .loop
+
+.done:
+    pop cx
+    pop ax
+    ret
+
 print_u8_2:
     push ax
     push bx

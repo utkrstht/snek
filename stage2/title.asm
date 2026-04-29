@@ -268,6 +268,10 @@ maybe_animate_title_hint:
     push ax
     push dx
 
+    mov al, [menu_state]
+    cmp al, 0
+    jne .done
+
     mov ah, 0x00
     int 0x1A
     mov ax, dx
@@ -291,6 +295,12 @@ draw_rainbow_hint:
     push cx
     push dx
     push si
+
+    mov dh, 15
+    mov dl, 21
+    mov cx, 59
+    mov bl, 0x08
+    call clear_text_region
 
     mov dh, 15
     mov dl, 21
