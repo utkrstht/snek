@@ -27,6 +27,7 @@ main_loop:
     cmp byte [paused], 0
     jne .draw_only
     call step_snake
+    call update_eat_animation
 
 .draw_only:
     call draw_frame

@@ -237,11 +237,12 @@ step_snake:
     je .done
     cmp byte [snake_len], MAX_LEN
     jae .respawn
-    inc byte [snake_len]
 
 .respawn:
-    call update_best_score
     call sound_food_eat
+    mov byte [eat_anim_active], 1
+    mov byte [eat_anim_pos], 0
+    mov byte [eat_anim_counter], 1
     mov al, [eaten_food_idx]
     call spawn_food_at_idx
     jmp .done
@@ -368,4 +369,32 @@ spawn_food_at_idx:
     pop cx
     pop bx
     pop ax
+    ret
+
+update_eat_animation:
+    cmp byte [eat_anim_active], 0
+    je .done
+    
+    dec byte [eat_anim_counter]
+    cmp byte [eat_anim_counter], 0
+    jg .done
+
+    mov byte [eat_anim_counter], 1
+    inc byte [eat_anim_pos]
+
+    mov al, [eat_anim_pos]
+    mov ah, 0
+    mov bl, [snake_len]
+    cmp al, bl
+    jb .done
+
+    mov byte [eat_anim_active], 0
+    mov al, [snake_len]
+    cmp al, MAX_LEN
+    jae .no_grow
+    inc byte [snake_len]
+.no_grow:
+    call update_best_score
+
+.done:
     ret

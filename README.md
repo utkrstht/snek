@@ -40,4 +40,4 @@ note: everything on this list is subject to change
 
 #### latest commit name
 ignore this
-- fix: hints overlapping if a smaller hint is shown + hint overwrites text in credits screen
+- feat: add new snek eating animation

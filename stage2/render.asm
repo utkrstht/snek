@@ -175,6 +175,7 @@ draw_snake:
     jmp .next
 
 .done:
+    call draw_eat_animation
     ret
 
 draw_hud:
@@ -220,4 +221,69 @@ draw_hud:
     mov dl, 44
     mov bl, 0x0E
     call print_u8_2
+    ret
+
+draw_eat_animation:
+    cmp byte [eat_anim_active], 0
+    je .done
+    
+    xor si, si
+    mov al, [eat_anim_pos]
+    mov ah, 0
+    mov si, ax
+    
+    mov al, [snake_len]
+    cmp si, ax
+    jae .done
+    
+    mov al, [snake_x + si]
+    add al, BOARD_X + 1
+    mov dl, al
+    mov al, [snake_y + si]
+    add al, BOARD_Y + 1
+    mov dh, al
+    
+    mov al, [snek_style_idx]
+    cmp al, 0
+    je .classic_style
+
+    cmp si, 0
+    je .seg_head
+    mov bl, [snake_len]
+    dec bl
+    xor bh, bh
+    cmp si, bx
+    je .seg_tail
+    test si, 1
+    jz .seg_even
+    mov bl, 0x02
+    jmp .seg_draw
+.seg_even:
+    mov bl, 0x0A
+    jmp .seg_draw
+.seg_tail:
+    mov bl, 0x03
+    jmp .seg_draw
+
+.classic_style:
+    cmp si, 0
+    je .seg_head
+    mov bl, [snake_len]
+    dec bl
+    xor bh, bh
+    cmp si, bx
+    je .seg_classic_tail
+    mov bl, 0x0A
+    jmp .seg_draw
+.seg_classic_tail:
+    mov bl, 0x02
+    jmp .seg_draw
+
+.seg_head:
+    mov bl, 0x0E
+.seg_draw:
+    mov al, 'O'
+    call putc_at
+    
+.done:
     ret

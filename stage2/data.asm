@@ -74,6 +74,9 @@ menu_state: db 0
 menu_idx: db 0
 food_spawn_idx: db 1
 snek_style_idx: db 0
+eat_anim_active: db 0
+eat_anim_pos: db 0
+eat_anim_counter: db 0
 
 snake_x:     times MAX_LEN + 1 db 0
 snake_y:     times MAX_LEN + 1 db 0
